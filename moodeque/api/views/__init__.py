@@ -19,14 +19,18 @@ class BaseView(object):
         return method(*args, **kwargs)
 
     def head(self):
-        self.get()
-        return ''
+        result = self.get()
+        response.body = ''
+        response.headers.update(
+            {'Content-Length': 0,
+             'Content-Type': 'application/json; charset=UTF-8'}
+        )
+        return response
 
 
 class MatchBaseView(BaseView):
 
     def __init__(self, request):
         super(MatchBaseView, self).__init__(request)
-        self.log.info(self.request.matchdict)
         for k, v in self.request.matchdict.iteritems():
             setattr(self, k, v)
