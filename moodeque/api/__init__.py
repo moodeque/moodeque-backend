@@ -3,6 +3,7 @@ import logging
 from moodeque.stereomood import StereoMoodClient
 from redis import StrictRedis
 from pyramid.config import Configurator
+log = logging.getLogger(__name__)
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -28,11 +29,6 @@ def redis_connect(request):
         if opt in conf:
             conf[opt] = int(conf[opt])
     conn = StrictRedis(**conf)
-    def cleanup(_):
-        log.debug("Closing connection to redis.")
-        conn.close()
-
-    request.add_finished_callback(cleanup)
     return conn
 
 def stereomood_connect(request):

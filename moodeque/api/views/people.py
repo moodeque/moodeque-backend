@@ -8,7 +8,7 @@ class PersonBase(MatchBaseView):
 
     def __init__(self, request):
         super(PersonBase, self).__init__(request)
-        self.user = User.get(self.request.db, self.uid)
+        self.user = User.find(self.request.db, self.uid)
 
 
 @view_defaults(route_name="people")
@@ -24,12 +24,12 @@ class PeopleView(BaseView):
 
     def post(self):
         user = User.create(userid=self.request.params['userid'],
-                           mood=self.request.params.get('mood', 0)
+                           mood=self.request.params.get('mood', 0))
         return user.to_dict()
 
 
 @view_defaults(route_name="person")
-class PersonView(MatchBaseView):
+class PersonView(PersonBase):
 
     @view_config(renderer='json')
     def dispatch(self):
@@ -50,7 +50,7 @@ class PersonView(MatchBaseView):
 
 
 @view_defaults(route_name="login")
-class LoginView(BaseView):
+class LoginView(PersonBase):
 
     @view_config(renderer='json')
     def dispatch(self):
@@ -61,17 +61,3 @@ class LoginView(BaseView):
         self.log.info(message)
         return {}
         # return self.user.to_dict()
-
-
-@view_defaults(route_name="mood")
-class MoodView(MatchBaseView):
-
-    @view_config(renderer='json')
-    def dispatch(self):
-        return self._dispatch()
-
-    def get(self):
-        return {}
-
-    def put(self):
-        return {}

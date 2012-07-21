@@ -10,8 +10,8 @@ from collections import Counter
 class VenueBase(MatchBaseView):
 
     def __init__(self, request):
-        super(CustomersView, self).__init__(request)
-        self.venue = Venue.get(self.request.db, self.venueid)
+        super(VenueBase, self).__init__(request)
+        self.venue = Venue.find(self.request.db, self.venueid)
 
 
 @view_defaults(route_name="venues")
@@ -139,7 +139,7 @@ class CustomersView(VenueBase):
         return [u.to_dict() for u in self.venue.users]
 
     def post(self):
-        user = User.get(self.request.db, self.request.params['user'])
+        user = User.find(self.request.db, self.request.params['user'])
         user.checkin(self.venue)
         return user.to_dict()
 
@@ -152,9 +152,9 @@ class CustomerView(VenueBase):
         return self._dispatch()
 
     def get(self):
-        return User.get(self.request.db, self.uid).to_dict()
+        return User.find(self.request.db, self.uid).to_dict()
 
     def delete(self):
-        user = User.get(self.request.db, self.uid)
+        user = User.find(self.request.db, self.uid)
         user.checkout(self.venue)
         return user.to_dict()
