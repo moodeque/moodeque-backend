@@ -1,9 +1,9 @@
 # part of moodeque
 
-from moodeque.models import rediscoll
+from . import rediscoll
 from moodeque.models import playlist
-from moodeque.models import BaseModel
-from moodeque.models import RedisModel
+from moodeque.models.base import (BaseModel,
+                                  RedisModel)
 
 
 class Venue(BaseModel, RedisModel):
@@ -14,27 +14,26 @@ class Venue(BaseModel, RedisModel):
     """
     export_attrs = ('description', 'latitude', 'longitude')
 
-    db_attrs = ('description', 'latitude', 'longitude', '_last_mood')
+    db_attrs = ('description', 'latitude', 'longitude')
 
     @classmethod
     def dbname(cls, venueid):
         return "venue.%s" %(str(venueid))
 
     def destroy(self):
+        self._playlist.destroy()
         idx = rediscoll.Set(cls.dbindex(), self._db)
         idx.remove(self.venueid)
         self._db.delete(cls.dbname(self.venueid))
 
     def __init__(self, db, venueid, description, latitude, longitude):
+        super(Venue, self).__init__(db, venueid)
         self.venueid = venueid
         self.description = description
-        self.latituide = latitude
+        self.latitude = latitude
         self.longitude = longitude
         self._db = db
-        self._last_mood = None
         self._playlist = playlist.PlayList(name, db)
-        self._user_moods = None
-        self._user_group = None
 
     def overall_mood(self):
         """

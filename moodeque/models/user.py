@@ -1,8 +1,8 @@
 # part of moodeque
 
-from moodeque.models import rediscoll
-from moodeque.models import BaseModel
-from moodeque.models import RedisModel
+from . import rediscoll
+from moodeque.models.base import (BaseModel,
+                                  RedisModel)
 
 
 class User(BaseModel, RedisModel):
