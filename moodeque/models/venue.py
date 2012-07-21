@@ -22,8 +22,8 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 
-from . import rediscoll
-from . import playlist
+from moodeque.models import rediscoll
+from moodeque.models import playlist
 
 
 class Venue(object):
@@ -32,15 +32,58 @@ class Venue(object):
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
-    def __init__(self, db, name, description, location):
-        self.name = name
+    @classmethod
+    def dbname(cls, venueid):
+        return "venue.%s" %(str(venueid))
+
+    @classmethod
+    def dbindex(cls):
+        return "venues"
+
+    @classmethod
+    def create(cls, db, venueid, description, latitude, longitude):
+        robj = Venue(db, venueid, description, latitude, longitude)
+        idx = rediscoll.Set(Venue.dbindex(), db)
+        idx.add(Venue.dbname(venueid))
+        robj.save()
+        return robj
+
+    @classmethod
+    def find(cls, db, venueid):
+        robj = rediscoll.Hash(Venue.dbname(venueid), db)
+        venue = Venue(db, venueid,
+                      robj['description'],
+                      robj['latitude'],
+                      robj['longitude'])
+        venue._last_mood = robj['last_mood']
+        venue._playlist = playlist.Playlist.find(db, venueid)
+
+    @classmethod
+    def all(cls, db):
+        robj = rediscoll.Set(Venue.dbindex(), db)
+        return robj.all()
+
+    def save(self):
+        robj = rediscoll.Hash(Venue.dbname(self.venueid), self._db)
+        robj['description'] = self.description
+        robj['latitude'] = self.latitude
+        robj['longitude'] = self.longitude
+
+    def destroy(self):
+        idx = rediscoll.Set(Venue.dbindex(), self._db)
+        idx.remove(self.venueid)
+        self._db.delete(Venue.dbname(self.venueid))
+
+    def __init__(self, db, venueid, description, latitude, longitude):
+        self.venueid = venueid
         self.description = description
-        self.location = location
+        self.latituide = latitude
+        self.longitude = longitude
         self._db = db
         self._last_mood = None
         self._playlist = playlist.PlayList(name, db)
         self._user_moods = crowd.Crowd(name, db)
-        self._user_group = population.Population(name, db) 
+        self._user_group = population.Population(name, db)
 
     def __str__(self):
         return str(self._name)
@@ -53,7 +96,6 @@ class Venue(object):
         Returns the number of the users currently in the venue.
         """
         raise NotImplementedError
-        return len(self._population)
 
     def overall_mood(self):
         """
@@ -86,9 +128,15 @@ class Venue(object):
         """
         raise NotImplementedError
 
-    def playing(self, song):
+    def play(self, song):
         """
         Registers the given song as the one currently being played.
+        """
+        raise NotImplementedError
+
+    def users(self):
+        """
+        Returns an iterable containing of all the users objects currently in the venue.
         """
         raise NotImplementedError
 
