@@ -12,6 +12,9 @@ requires = [
     'waitress',
     'redis',
     'redisco',
+    'requests',
+    'requests-oauth',
+    'mutagen',
     ]
 
 setup(name='moodeque',
