@@ -22,3 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 
+from user import User
+from venue import Venue
+from playlist import Playlist
+

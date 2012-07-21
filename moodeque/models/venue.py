@@ -26,17 +26,16 @@ from . import rediscoll
 from . import playlist
 
 
-
 class Venue(object):
     """
     This class represents a Moodeque venue.
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
-    def __init__(self, name, description, location, db):
-        self._name = name
-        self._description = description
-        self._location = location
+    def __init__(self, db, name, description, location):
+        self.name = name
+        self.description = description
+        self.location = location
         self._db = db
         self._last_mood = None
         self._playlist = playlist.PlayList(name, db)
