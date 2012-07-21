@@ -10,6 +10,8 @@ class Song(object):
         self.image_url = image_url
         self.audio_url = audio_url
         self.post_url = post_url
+        self.length = None
+        self.local_path = None
 
 
 
