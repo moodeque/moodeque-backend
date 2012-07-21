@@ -8,7 +8,7 @@ class PersonBase(MatchBaseView):
 
     def __init__(self, request):
         super(PersonBase, self).__init__(request)
-        self.user = User.get(self.request.db, self.uid)
+        self.user = User.find(self.request.db, self.uid)
 
 
 @view_defaults(route_name="people")
@@ -29,7 +29,7 @@ class PeopleView(BaseView):
 
 
 @view_defaults(route_name="person")
-class PersonView(MatchBaseView):
+class PersonView(PersonBase):
 
     @view_config(renderer='json')
     def dispatch(self):
@@ -50,7 +50,7 @@ class PersonView(MatchBaseView):
 
 
 @view_defaults(route_name="login")
-class LoginView(BaseView):
+class LoginView(PersonBase):
 
     @view_config(renderer='json')
     def dispatch(self):
