@@ -25,7 +25,7 @@ from . import rediscoll
 
 
 class PlayList(object):
-    def __init__(self, venue, db):
+    def __init__(self, db, venue):
         self._songs = rediscoll.List('%s:songs' %(str(venue)), db)
     def __len__(self):
         return len(self._songs)
