@@ -13,7 +13,7 @@ class User(object):
 
     @classmethod
     def autoid(cls, db):
-        return db.incr("%s.seqno" %(Playlist.dbindex()))
+        return db.incr("%s.seqno" %(PlayList.dbindex()))
 
     @classmethod
     def create(cls, db, mood):

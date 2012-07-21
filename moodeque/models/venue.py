@@ -18,7 +18,7 @@ class Venue(object):
 
     @classmethod
     def autoid(cls, db):
-        return db.incr("%s.seqno" %(Playlist.dbindex()))
+        return db.incr("%s.seqno" %(PlayList.dbindex()))
 
     @classmethod
     def create(cls, db, description, latitude, longitude):
@@ -37,7 +37,7 @@ class Venue(object):
                       robj['latitude'],
                       robj['longitude'])
         venue._last_mood = robj['last_mood']
-        venue._playlist = playlist.Playlist.find(db, venueid)
+        venue._playlist = playlist.PlayList.find(db, venueid)
 
     @classmethod
     def all(cls, db):

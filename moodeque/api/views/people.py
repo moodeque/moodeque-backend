@@ -24,7 +24,7 @@ class PeopleView(BaseView):
 
     def post(self):
         user = User.create(userid=self.request.params['userid'],
-                           mood=self.request.params.get('mood', 0)
+                           mood=self.request.params.get('mood', 0))
         return user.to_dict()
 
 
@@ -61,17 +61,3 @@ class LoginView(BaseView):
         self.log.info(message)
         return {}
         # return self.user.to_dict()
-
-
-@view_defaults(route_name="mood")
-class MoodView(MatchBaseView):
-
-    @view_config(renderer='json')
-    def dispatch(self):
-        return self._dispatch()
-
-    def get(self):
-        return {}
-
-    def put(self):
-        return {}

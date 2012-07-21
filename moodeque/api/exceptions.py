@@ -16,6 +16,6 @@ def generate_empty_response(context, request, status, add_headers={}):
     # TODO add logging with ip/user/agent etc etc
     log.info("Generating empty response [status: %s, headers:%s]",
               status, response.headers)
-    log.debug("request: %s", request)
-    log.debug("response: %s", response)
+    # log.debug("request: %s", request)
+    # log.debug("response: %s", response)
     return response

@@ -24,7 +24,9 @@ stereomood.username =
 stereomood.password = 
 
 # must be writable by the webserver
-moodeque.song_cache_path = %(here)/data
+moodeque.song_cache_path = %(here)s/data
+
+# moodeque.gevent = false
 
 [server:main]
 use = egg:waitress#main
