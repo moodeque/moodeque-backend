@@ -12,13 +12,10 @@ def main(global_config, **settings):
         raise ValueError("Invalid version {0}", version)
     prefix = "/{0}/{1}".format(base_url, version)
     config.include(includeme, route_prefix=prefix)
-    config.scan()
+    config.scan("moodeque.api.views")
     return config.make_wsgi_app()
 
 def includeme(config):
-    add_routes(config)
-
-def add_routes(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('root', '/')
     config.add_route('venues', '/venues')
