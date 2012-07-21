@@ -14,9 +14,9 @@ requires = [
     'redisco',
     ]
 
-setup(name='backend',
+setup(name='moodeque',
       version='0.0',
-      description='backend',
+      description='moodeque',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -33,10 +33,10 @@ setup(name='backend',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="backend",
+      test_suite="moodeque",
       entry_points = """\
       [paste.app_factory]
-      main = backend.api:main
+      main = moodeque.api:main
       """,
       )
 

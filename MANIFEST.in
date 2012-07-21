@@ -1,2 +1,2 @@
 include *.txt *.cfg *.rst *.sample
-recursive-include backend *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+recursive-include moodeque *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
