@@ -1,83 +1,29 @@
-# (C) 2012 Francesco Romani <fromani . gmail . com>
-#
-# Permission is hereby granted, free of charge, to any person
-# obtaining a copy of this software and associated documentation
-# files (the "Software"), to deal in the Software without
-# restriction, including without limitation the rights to use,
-# copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following
-# conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-
+# part of moodeque
 
 from moodeque.models import rediscoll
 from moodeque.models import playlist
+from moodeque.models import BaseModel
+from moodeque.models import RedisModel
 
 
-class Venue(object):
+class Venue(BaseModel, RedisModel):
     """
     This class represents a Moodeque venue.
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
+    export_attrs = ('description', 'latitude', 'longitude')
+
+    db_attrs = ('description', 'latitude', 'longitude', '_last_mood')
+
     @classmethod
     def dbname(cls, venueid):
         return "venue.%s" %(str(venueid))
 
-    @classmethod
-    def dbindex(cls):
-        return "venues"
-
-    @classmethod
-    def autoid(cls, db):
-        return db.incr("%s.seqno" %(Playlist.dbindex()))
-
-    @classmethod
-    def create(cls, db, description, latitude, longitude):
-        venueid = Venue.autoid()
-        robj = Venue(db, venueid, description, latitude, longitude)
-        idx = rediscoll.Set(Venue.dbindex(), db)
-        idx.add(Venue.dbname(venueid))
-        robj.save()
-        return robj
-
-    @classmethod
-    def find(cls, db, venueid):
-        robj = rediscoll.Hash(Venue.dbname(venueid), db)
-        venue = Venue(db, venueid,
-                      robj['description'],
-                      robj['latitude'],
-                      robj['longitude'])
-        venue._last_mood = robj['last_mood']
-        venue._playlist = playlist.Playlist.find(db, venueid)
-
-    @classmethod
-    def all(cls, db):
-        robj = rediscoll.Set(Venue.dbindex(), db)
-        return robj.all()
-
-    def save(self):
-        robj = rediscoll.Hash(Venue.dbname(self.venueid), self._db)
-        robj['description'] = self.description
-        robj['latitude'] = self.latitude
-        robj['longitude'] = self.longitude
-
     def destroy(self):
-        idx = rediscoll.Set(Venue.dbindex(), self._db)
+        idx = rediscoll.Set(cls.dbindex(), self._db)
         idx.remove(self.venueid)
-        self._db.delete(Venue.dbname(self.venueid))
+        self._db.delete(cls.dbname(self.venueid))
 
     def __init__(self, db, venueid, description, latitude, longitude):
         self.venueid = venueid
@@ -87,8 +33,8 @@ class Venue(object):
         self._db = db
         self._last_mood = None
         self._playlist = playlist.PlayList(name, db)
-        self._user_moods = crowd.Crowd(name, db)
-        self._user_group = population.Population(name, db)
+        self._user_moods = None
+        self._user_group = None
 
     def overall_mood(self):
         """
@@ -122,6 +68,13 @@ class Venue(object):
         """
         raise NotImplementedError
 
+    @property
+    def people(self):
+        """
+        Returns an iterable containing of all the users objects currently in the venue.
+        """
+        raise NotImplementedError
+
     def play(self, song):
         """
         Registers the given song as the one currently being played.
@@ -132,9 +85,4 @@ class Venue(object):
         "index sempre negativo, ritorna oggetto song"
         raise NotImplementedError
 
-    def users(self):
-        """
-        Returns an iterable containing of all the users objects currently in the venue.
-        """
-        raise NotImplementedError
 
