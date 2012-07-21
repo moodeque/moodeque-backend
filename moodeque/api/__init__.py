@@ -1,4 +1,7 @@
 import re
+import logging
+from moodeque.stereomood import StereoMoodClient
+from redis import StrictRedis
 from pyramid.config import Configurator
 
 def main(global_config, **settings):
@@ -12,22 +15,49 @@ def main(global_config, **settings):
         raise ValueError("Invalid version {0}", version)
     prefix = "/{0}/{1}".format(base_url, version)
     config.include(includeme, route_prefix=prefix)
-    config.scan()
+    config.scan("moodeque.api.views")
     return config.make_wsgi_app()
 
-def includeme(config):
-    add_routes(config)
 
-def add_routes(config):
+def redis_connect(request):
+    conf = {k.replace("redis.", ""): request.registry.settings[k]
+            for k in request.registry.settings
+            if k.startswith("redis")}
+    log.debug("Connecting to redis: {}".format(conf))
+    for opt in ("port", "db"):
+        if opt in conf:
+            conf[opt] = int(conf[opt])
+    conn = StrictRedis(**conf)
+    def cleanup(_):
+        log.debug("Closing connection to redis.")
+        conn.close()
+
+    request.add_finished_callback(cleanup)
+    return conn
+
+def stereomood_connect(request):
+    conf = {k.replace("stereomood.", ""): request.registry.settings[k]
+            for k in request.registry.settings
+            if k.startswith("stereomood")}
+    log.debug("Connecting to stereomood: {}".format(conf))
+
+    conn = StereoMoodClient(**conf)
+    return conn
+
+
+def includeme(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.set_request_property("moodeque.api.redis_connect", name="db",
+                                reify=True)
+    config.set_request_property("moodeque.api.stereomood_connect",
+                                name="stereomood", reify=True)
     config.add_route('root', '/')
     config.add_route('venues', '/venues')
     config.add_route('venue', '/venues/{venueid}')
-    config.add_route('playlist', '/venues/{venue}/playlist')
-    config.add_route('song', '/venues/{venue}/playlist/{method}')
-    config.add_route('customers', '/venues/{venue}/people')
-    config.add_route('customer', '/venues/{venue}/people/{uid}')
+    config.add_route('playlist', '/venues/{venueid}/playlist')
+    config.add_route('song', '/venues/{venueid}/playlist/{method}')
+    config.add_route('customers', '/venues/{venueid}/people')
+    config.add_route('customer', '/venues/{venueid}/people/{uid}')
     config.add_route('people', '/people')
     config.add_route('person', '/people/{uid}')
     config.add_route('login', '/people/{uid}/login')
-    config.add_route('mood', '/people/{uid}/mood')

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Moodeque</title>
+		<link href='http://fonts.googleapis.com/css?family=Chango' rel='stylesheet' type='text/css'>
+		<link href='css/style.css' rel='stylesheet' type='text/css'>
+	    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    	<link href="css/font-awesome.css" rel="stylesheet" type="text/css">
+		<link href='css/dancer.css' rel='stylesheet' type='text/css'>
+		<script src="js/jquery-1.7.2.min.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<div id="logo">
+			<img src="images/logo-alt.png"/> Moodeque
+		</div>
+		<div id="status">
+			<div class="people">
+				<span class="badge"><i class="icon-user"></i> 2500 users</span>
+			</div>
+			<p>
+				<img src="images/excited.png"/> &nbsp; <span class="badge badge-info">25% Excited</span>
+			</p>
+			<p>
+				<img src="images/happy.png"/> &nbsp; <span class="badge badge-success">25% Happy</span>
+			</p>
+			<p>
+				<img src="images/bored.png"/> &nbsp; <span class="badge badge-warning">25% Bored</span>
+			</p>
+			<p>
+				<img src="images/sad.png"/> &nbsp; <span class="badge badge-important">25% Sad</span>
+			</p>
+			<div id="controls" class="btn-toolbar">
+				<div class="btn-group">
+					<button class="btn" id="prev-song-btn"><i class="icon-backward"></i></btn>
+				</div>
+				<div class="btn-group">
+					<button class="btn" id="stop-song-btn"><i class="icon-stop"></i></btn>
+				</div>
+				<div class="btn-group">
+					<button class="btn" id="play-song-btn"><i class="icon-play"></i></btn>
+				</div>
+				<div class="btn-group">
+					<button class="btn" id="next-song-btn"><i class="icon-forward"></i></btn>
+				</div>
+			</div>
+		</div>
+		<div id="song">
+			<div>
+				<p class="title">
+					<span>Du Hast</span>
+				</p>
+				<p class="author">
+					<em>Rammstein</em>
+				</p>
+				<p class="album">
+					<span>Sehnsucht</span>
+				</p>
+			</div>
+		</div>
+		<!--<canvas id="fft" height="50" width="256"></canvas><div id="songinfo"></div>-->
+		<!--<div id="loading">Loading . . .</div>-->
+		<!-- Demo dependencies -->
+		<script src="js/Three.js"></script>
+		<script src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<!-- Dancer.js -->
+		<script src="js/dancer.js"></script>
+		<script src="js/support.js"></script>
+		<script src="js/beat.js"></script>
+		<script src="js/adapterWebkit.js"></script>
+		<script src="js/adapterMoz.js"></script>
+		<script src="js/adapterFlash.js"></script>
+		<script src="js/fft.js"></script>
+		<script src="js/flash_detect.js"></script>
+		<script src="js/dancer.fft.js"></script>
+		<!-- Demo stuff -->
+		<script src="js/scene.js"></script>
+		<script src="js/player.js"></script>
+		<script>
+			/*
+			(function () {
+				var fft = document.getElementById( 'fft' ),
+					toggle = document.getElementById( 'togglefft' );
+				toggle.addEventListener( 'click', function ( e ) {
+					e.preventDefault();
+					fft.style.display = fft.style.display == 'block' ? 'none' : 'block';
+				}, true );
+
+				// Due to requiring loading message to float above the rest (absolute)
+				// But still wanting it centered;
+				var loading = document.getElementById('loading');
+				loading.style.marginLeft = (( window.outerWidth - 500 ) / 2) + 'px';
+			})();
+		function setAlarm() {
+			setTimeout(refreshTime, 1000);
+		}
+		function refreshTime() {
+			alert(window.dancer.getTime());
+			setAlarm();
+		}
+		setTimeout(refreshTime, 1000);
+		*/
+		</script>
+	</body>
+</html>
