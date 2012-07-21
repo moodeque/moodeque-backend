@@ -1,7 +1,7 @@
 # rediscoll: pythonic data structure translated to redis.
 # (C) 2012 Francesco Romani <fromani . gmail . com>
 # based on the redisco.collections module of the redisco package.
-# LICENSE: same as the original (follows) 
+# LICENSE: same as the original (follows)
 #
 # Copyright (c) 2010 Tim Medina
 #
@@ -33,6 +33,7 @@ that persist directly in a Redis server.
 
 import collections
 
+
 class ConnectionError(Exception):
     pass
 
@@ -48,12 +49,9 @@ class Container(object):
     ``redisco.connection`` module.
     """
 
-    def __init__(self, key, db=None):
+    def __init__(self, key, db):
         self.key = key
-        if callable(db):
-            self._db = db(key)
-        else:
-            self._db = db
+        self._db = db
 
     def clear(self):
         """Remove container from Redis database."""
