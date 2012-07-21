@@ -41,7 +41,12 @@ class Venue(object):
         return "venues"
 
     @classmethod
-    def create(cls, db, venueid, description, latitude, longitude):
+    def autoid(cls, db):
+        return db.incr("%s.seqno" %(Playlist.dbindex()))
+
+    @classmethod
+    def create(cls, db, description, latitude, longitude):
+        venueid = Venue.autoid()
         robj = Venue(db, venueid, description, latitude, longitude)
         idx = rediscoll.Set(Venue.dbindex(), db)
         idx.add(Venue.dbname(venueid))
@@ -85,18 +90,6 @@ class Venue(object):
         self._user_moods = crowd.Crowd(name, db)
         self._user_group = population.Population(name, db)
 
-    def __str__(self):
-        return str(self._name)
-
-    def __repr__(self):
-        raise NotImplementedError
-
-    def count(self):
-        """
-        Returns the number of the users currently in the venue.
-        """
-        raise NotImplementedError
-
     def overall_mood(self):
         """
         Returns the overall combined mood of all the users in the venue.
@@ -106,23 +99,24 @@ class Venue(object):
         """
         raise NotImplementedError
 
-    def checkin(self, userid):
+    def checkin(self, user):
         """
         Register an user in the venue. The user will now contribute to
         the overall mood of the venue.
         """
         raise NotImplementedError
 
-    def checkout(self, userid):
+    def checkout(self, user):
         """
         Deregister an user from the venue. The user will no longer contribute to
         the overall mood of the venue.
         """
         raise NotImplementedError
 
-    def playlist(self, num=1):
+    @property
+    def playlist(self):
         """
-        Returns a list of the last num played song.
+        Returns l'oggetto playlist.
         The currently played song is always the first one, the others
         following in reverse played order.
         """
@@ -132,6 +126,10 @@ class Venue(object):
         """
         Registers the given song as the one currently being played.
         """
+        raise NotImplementedError
+
+    def get_in_playlist(self, index):
+        "index sempre negativo, ritorna oggetto song"
         raise NotImplementedError
 
     def users(self):
