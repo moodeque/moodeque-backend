@@ -21,6 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import operator
 
 from moodeque.models import rediscoll
 from moodeque.models import playlist
@@ -32,6 +33,20 @@ class Venue(object):
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
+
+    MOODS = (
+        'crap',
+        'sad',
+        'melancholy',
+        'worried',
+        'serious',
+        'cool',
+        'optimistic'
+        'energetic',
+        'happy',
+        'mad',
+    )
+
     @classmethod
     def dbname(cls, venueid):
         return "venue.%s" %(str(venueid))
@@ -93,11 +108,15 @@ class Venue(object):
     def overall_mood(self):
         """
         Returns the overall combined mood of all the users in the venue.
-        A positive value indicates a good mood.
-        A negative value indicates a bad mood.
         The greater the value, the stronger the feeling.
         """
-        raise NotImplementedError
+        counter = dict([(mood, 0) for mood in self.MOODS])
+
+        for user in self.users():
+            user_mood = self.MOODS[user.mood]
+            counter[user_mood] += 1
+
+        return sorted(counter.iteritems(), key=operator.itemgetter(1))[-1][0]
 
     def checkin(self, user):
         """
