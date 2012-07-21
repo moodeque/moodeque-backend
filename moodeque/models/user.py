@@ -23,66 +23,67 @@
 
 
 from moodeque.models import rediscoll
+from moodeque.models import venue
 
 
-class Playlist(object):
+class User(object):
     @classmethod
-    def dbname(cls, plid):
-        return "playlist.%s" %(str(plid))
+    def dbname(cls, userid):
+        return "user.%s" %(str(userid))
 
     @classmethod
     def dbindex(cls):
-        return "playlists"
+        return "users"
 
     @classmethod
     def autoid(cls, db):
         return db.incr("%s.seqno" %(Playlist.dbindex()))
 
     @classmethod
-    def create(cls, db):
-        plid = Playlist.autoid(db)
-        pl = Playlist(db, plid)
-        idx = rediscoll.Set(Playlist.dbindex(), db)
-        idx.add(Playlist.dbname(plid))
-        pl.save()
-        return pl
+    def create(cls, db, mood):
+        userid = User.autoid(db)
+        usr = User(db, userid, mood)
+        idx = rediscoll.Set(User.dbindex(), db)
+        idx.add(User.dbname(userid))
+        usr.save()
+        return usr
 
     @classmethod
-    def find(cls, db, plid):
-        return rediscoll.List(Playlist.dbname(plid), db)
+    def find(cls, db, userid):
+        robj = rediscoll.Hash(User.dbname(userid), db)
+        return User(db, userid, robj['mood'])
 
     @classmethod
     def all(cls, db):
-        robj = rediscoll.Set(Playlist.dbindex(), db)
+        robj = rediscoll.Set(User.dbindex(), db)
         return robj.all()
 
     def save(self):
-        pass
+        robj = rediscoll.Hash(User.dbname(self.userid), self._db)
+        robj['mood'] = self.mood
 
     def destroy(self):
-        idx = rediscoll.Set(Playlist.dbindex(), self._db)
-        idx.remove(self.plid)
-        self._db.delete(Playlist.dbname(self.plid))
+        idx = rediscoll.Set(User.dbindex(), self._db)
+        idx.remove(self.userid)
+        self._db.delete(User.dbname(self.userid))
 
-    def __init__(self, db, plid):
-        self.plid = plid
-        self._songs = rediscoll.List(Playlist.dbname(plid), db)
+    def __init__(self, db, userid, mood):
+        self._db = db
+        self.userid = userid
+        self.mood = mood
 
-    def __len__(self):
-        return len(self._songs)
+    def checkin(self, venue):
+        """
+        Register an user in the venue. The user will now contribute to
+        the overall mood of the venue.
+        """
+        venue.checkin(self)
 
-    def __contains__(self, song):
-        return song in self._songs
+    def checkout(self, venue):
+        """
+        Deregister an user from the venue. The user will no longer contribute to
+        the overall mood of the venue.
+        """
+        venue.checkout(self)
 
-    def append(self, song):
-        return self._songs.append(song)
-
-    def current(self):
-        return self._songs[-1]
-
-    def clean(self):
-        pass
-
-    def __getitem__(self, index):
-        return self._songs[index]
 
