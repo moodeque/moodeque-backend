@@ -36,7 +36,12 @@ class User(object):
         return "users"
 
     @classmethod
-    def create(cls, db, userid, mood):
+    def autoid(cls, db):
+        return db.incr("%s.seqno" %(Playlist.dbindex()))
+
+    @classmethod
+    def create(cls, db, mood):
+        userid = User.autoid(db)
         usr = User(db, userid, mood)
         idx = rediscoll.Set(User.dbindex(), db)
         idx.add(User.dbname(userid))
@@ -67,18 +72,18 @@ class User(object):
         self.userid = userid
         self.mood = mood
 
-    def checkin(self, venueid):
+    def checkin(self, venue):
         """
         Register an user in the venue. The user will now contribute to
         the overall mood of the venue.
         """
-        raise NotImplementedError
+        venue.checkin(self)
 
-    def checkout(self, venueid):
+    def checkout(self, venue):
         """
         Deregister an user from the venue. The user will no longer contribute to
         the overall mood of the venue.
         """
-        raise NotImplementedError
+        venue.checkout(self)
 
 
