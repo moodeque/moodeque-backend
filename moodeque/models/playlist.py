@@ -21,10 +21,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+
 from . import rediscoll
 
 
-class PlayList(object):
+class Playlist(object):
     def __init__(self, db, venue):
         self._songs = rediscoll.List('%s:songs' %(str(venue)), db)
     def __len__(self):
