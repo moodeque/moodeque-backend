@@ -29,10 +29,23 @@ class RedisModel(object):
         return robj.all()
 
     @classmethod
+    def setup(cls, db):
+        pass
+
+    @classmethod
+    def shutdown(cls, db):
+        pass
+
+    @classmethod
+    def lookup(cls, db):
+        pass
+
+    @classmethod
     def create(cls, db, **kwargs):
         did = cls.autoid(db)
         obj = cls.__new__(cls)
         obj.__init__(db, did, **kwargs)
+        cls.setup(db)
         cls.register(db, did)
         obj.save()
         return obj
@@ -46,6 +59,7 @@ class RedisModel(object):
         robj = cls.load(db, did)
         obj = cls.__new__(cls)
         obj.__init__(db, did, **robj)
+        cls.lookup(db)
         return obj
 
     def __init__(self, db, rid, **kwargs):
@@ -61,5 +75,6 @@ class RedisModel(object):
 
     def destroy(self):
         self.__class__.deregister(self._db, self._id)
+        self.__class__.shutdown(self._db)
         self._db.delete(self.__class__.dbname(self._id))
 
