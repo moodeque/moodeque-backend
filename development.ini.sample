@@ -9,6 +9,10 @@ pyramid.default_locale_name = en
 pyramid.includes = 
     pyramid_debugtoolbar
 
+# api config. Version is mandatory, base_url optional, defaults to 'api'
+moodeque.api.version = v1
+# moodeque.api.base_url = api
+
 [server:main]
 use = egg:waitress#main
 host = 0.0.0.0
