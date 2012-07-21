@@ -10,6 +10,8 @@ requires = [
     'pyramid',
     'pyramid_debugtoolbar',
     'waitress',
+    'redis',
+    'redisco',
     ]
 
 setup(name='backend',
