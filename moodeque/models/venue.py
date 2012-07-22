@@ -40,13 +40,17 @@ class Venue(BaseModel, RedisModel):
 
     @classmethod
     def lookup(cls, obj, db):
-        obj._playlist = playlist.Playlist.find(db, self.playlist_id)
-        obj._crowd = crowd.Crowd.find(db, self.crowd_id)
+        obj._playlist = playlist.Playlist.find(db, obj.playlist_id)
+        obj._crowd = crowd.Crowd.find(db, obj.crowd_id)
         obj.playlist_id = obj._playlist.plid
         obj.crowd_id = obj._crowd.crid
 
     def __init__(self, db, venueid, **kwargs):
         super(Venue, self).__init__(db, venueid, **kwargs)
+
+    def __str__(self):
+        return "%s (%s) is here: %i,%i" %(self.name, self.description,
+                                          int(self.latitude), int(self.longitude))
 
     def overall_mood(self):
         """
@@ -55,7 +59,7 @@ class Venue(BaseModel, RedisModel):
         """
         counter = Counter(self.MOODS)
 
-        for user in self.users():
+        for user in self.people:
             user_mood = self.MOODS[user.mood]
             counter[user_mood] += 1
 
