@@ -51,9 +51,9 @@ class VenueView(VenueBase):
     def get(self):
         venue = self.venue.to_dict()
         users = self.venue.people
-        moods = Counter()
+        moods = dict((i, 0) for i in xrange(10))
         for u in users:
-            moods[u.mood] += 1
+            moods[int(u.mood)] += 1
 
         song = None if not len(self.venue.playlist) else \
                 self.venue.playlist[-1].to_dict()
@@ -96,7 +96,7 @@ class PlaylistView(VenueBase):
                 songs = [self.venue.playlist[0].to_dict()]
             else:
                 songs = [s.to_dict() for s in self.venue.playlist]
-            return {"playlist": songs}
+            return {"playlist": list(reversed(songs))}
 
         except Exception as e:
             self.log.exception(str(e))
@@ -123,7 +123,7 @@ class SongView(VenueBase):
         limit = int(self.request.params.get('limit', 1))
         mood = self.venue.overall_mood
         songs = self.request.stereomood.search_by_mood(mood, limit=20)
-        songs = [songs[randrange(0, 19, 1)]]
+        songs = [songs[randrange(0, len(songs)-1, 1)]]
         result = []
         for s in songs:
             new_s = self.request.stereomood.download_song(s, 
