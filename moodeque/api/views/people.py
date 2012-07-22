@@ -19,7 +19,7 @@ class PeopleView(BaseView):
         return self._dispatch()
 
     def get(self):
-        users = [u.to_dict() for u in User.list(self.request.db)]
+        users = [u.to_dict() for u in User.all(self.request.db)]
         return {"users": users}
 
     def post(self):

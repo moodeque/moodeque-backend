@@ -22,24 +22,11 @@ class VenuesView(BaseView):
         return self._dispatch()
 
     def get(self):
-        return {'venues': [
-            { 'id': 0,
-              'name': 'prova1',
-              'description': 'Description',
-              'latitude': None,
-              'longitude': None
-            },
-            { 'id': 1,
-              'name': 'prova2',
-              'description': 'Description',
-              'latitude': None,
-              'longitude': None
-            }
-        ]}
-        # venues = [ v.to_dict() for v in Venue.list(self.request.db)]
-        # return {
-        #     "venues": v
-        # }
+
+        venues = [ v.to_dict() for v in Venue.all(self.request.db)]
+        return {
+            "venues": venues
+        }
 
     def post(self):
         venue = Venue.create(self.request.db,
