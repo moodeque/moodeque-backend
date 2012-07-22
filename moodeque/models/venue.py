@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-from collections import Counter
-
-from moodeque.models import rediscoll
-=======
 # part of moodeque
 
 from . import rediscoll
 from moodeque.models import crowd
->>>>>>> models
 from moodeque.models import playlist
 from moodeque.models.user import User
 from moodeque.models.base import (BaseModel,
