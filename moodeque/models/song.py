@@ -13,5 +13,8 @@ class Song(object):
         self.length = None
         self.local_path = None
 
-
+    def __str__(self):
+        return "#%s %s/%s by %s at %s" %(str(self.songid), str(self.album),
+                                         str(self.title), str(self.artist),
+                                         str(self.url))
 
