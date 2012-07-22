@@ -71,8 +71,8 @@
 		<script>
 		var App = {}
 		function getStatus () {
-			jQuery.getJSON('/api/venues/hackitaly', setStatus);
-			jQuery.getJSON('/api/venues/hackitaly/playlist/next', setNext);
+			jQuery.getJSON('/api/v1/venues/1', setStatus);
+			jQuery.getJSON('/api/v1/venues/1/playlist/next', setNext);
 		}
 		function setStatus(data) {
   			var people = data.people_count;
