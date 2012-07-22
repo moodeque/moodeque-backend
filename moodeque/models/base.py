@@ -7,6 +7,11 @@ class BaseModel(object):
     def to_dict(self):
         return {attr: getattr(self, attr) for attr in self.export_attrs}
 
+def _X_dedid(did):
+    if '.' not in did:
+        return did
+    return did.split('.')[-1]
+
 
 class RedisModel(object):
     @classmethod
@@ -26,7 +31,8 @@ class RedisModel(object):
     @classmethod
     def all(cls, db):
         robj = rediscoll.Set(cls.dbindex(), db)
-        return robj.all()
+#        return (cls.find(db, did) for did in robj.all())
+        return (cls.find(db, int(_X_dedid(did))) for did in robj.all())
 
     @classmethod
     def setup(cls, obj, db):
