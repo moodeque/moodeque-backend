@@ -30,6 +30,7 @@
 			<p>
 				<img src="images/sad.png"/> &nbsp; <span class="badge badge-important"><em id="sad-counter"></em>% Sad</span>
 			</p>
+			<!--
 			<div id="controls" class="btn-toolbar">
 				<div class="btn-group">
 					<button class="btn" id="stop-song-btn"><i class="icon-stop"></i></btn>
@@ -38,6 +39,7 @@
 					<button class="btn" id="play-song-btn"><i class="icon-play"></i></btn>
 				</div>
 			</div>
+		-->
 		</div>
 		<div id="song">
 			<div>
@@ -69,62 +71,44 @@
 		<script>
 		var App = {}
 		function getStatus () {
-			return {
-				songs: {
-					current: {
-						author: 'Rammstein',
-						title: 'Du Hast',
-						album: 'Sehnsucht',
-						length: '266000',
-						url: '/static/songs/duhast.mp3'
-					},
-					next: {
-						author: 'Zircon',
-						title: 'Devils Spirit',
-						album: 'Zirconoid',
-						length: '211000',
-						url: '/static/songs/zircon_devils_spirit.mp3'
-					}
-				},
-				venue: {
-					name: 'Hackitaly',
-					people: 241,
-					moods: {
-						excited: 30,
-						happy: 195,
-						bored: 11,
-						sad: 5
-					}
-				}
-			};
+			jQuery.getJSON('/api/venues/hackitaly', setStatus);
+			jQuery.getJSON('/api/venues/hackitaly/playlist/next', setNext);
 		}
-		function setSong() {
-			loadSong(App.status.songs.current.url);
-			setTimeout(function(){
-				switchSong();
-			}, 10000);
-		}
-		function switchSong() {
-			window.dancer.stop();
-			loadSong(App.status.songs.next.url);
-		}
-		jQuery(document).ready(function () {
-			App.status = getStatus();
-			setSong();
-			var people = App.status['venue']['people'];
-			var excited = App.status['venue']['moods']['excited'];
-			var happy = App.status['venue']['moods']['happy'];
-			var bored = App.status['venue']['moods']['bored'];
-			var sad = App.status['venue']['moods']['sad'];
-			jQuery('#venue-name').text(App.status['venue']['name']);
+		function setStatus(data) {
+  			var people = data.people_count;
+			var excited = data.moods['9'];
+			var happy = data.moods['5'] + data.moods['6'] + data.moods['7'] + data.moods['8'];
+			var bored = data.moods['3'] + data.moods['4'];
+			var sad = data.moods['0'] + data.moods['1'] + data.moods['2'];
+			jQuery('#venue-name').text(data.venue.name);
 			jQuery('#people-counter').text(people);
 			jQuery('#excited-counter').text(Math.round(excited * 100 / people));
 			jQuery('#happy-counter').text(Math.round(happy * 100 / people));
 			jQuery('#bored-counter').text(Math.round(bored * 100 / people));
 			jQuery('#sad-counter').text(Math.round(sad * 100 / people));
-			jQuery('#song-author').text(App.status.songs.current.author);
-			jQuery('#song-title').text(App.status.songs.current.title);
-			jQuery('#song-album').text(App.status.songs.current.album);
+			setTimeout(function(){
+				getStatus();
+			}, 10000);
+		}
+		function setNext(data) {
+			App.song = data.songs[0]
+			setTimeout(function(){
+				setSong();
+			}, 45000);
+		}
+		function setSong() {
+			window.dancer.stop();
+			loadSong(App.song.audio_url);
+			jQuery('#song-author').text(App.song.artist);
+			jQuery('#song-title').text(App.song.title);
+			jQuery('#song-album').text(App.song.album);
+		}
+		jQuery(document).ready(function () {
+			getStatus();
+			jQuery('#song-author').text('Rammstein');
+			jQuery('#song-title').text('Du Hast');
+			jQuery('#song-album').text('Sehnsucht');
+			loadSong('/static/songs/duhast.mp3');
 		});
 		</script>
 	</body>
