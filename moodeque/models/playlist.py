@@ -39,7 +39,7 @@ class Playlist(RedisModel):
     def __init__(self, db, plid):
         super(Playlist, self).__init__(db, plid)
         self.plid = plid
-        self._songs = rediscoll.List(PlayList.dbname(plid), db)
+        self._songs = rediscoll.List(Playlist.dbname(plid), db)
 
     def __len__(self):
         return len(self._songs)
