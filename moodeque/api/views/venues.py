@@ -6,6 +6,8 @@ from pyramid.view import (view_defaults,
 from moodeque.models import (Venue,
                              User)
 from collections import Counter
+from pyramid.httpexceptions import HTTPNotFound
+from random import randrange
 
 class VenueBase(MatchBaseView):
 
@@ -50,13 +52,16 @@ class VenueView(VenueBase):
         venue = self.venue.to_dict()
         users = self.venue.people
         moods = Counter()
-        for u in user:
+        for u in users:
             moods[u.mood] += 1
+
+        song = None if not len(self.venue.playlist) else \
+                self.venue.playlist[-1].to_dict()
 
         return dict(
             venue=venue,
-            people_count=len(self.venue.people),
-            current_song=self.playlist[-1].to_dict(),
+            people_count=len(list(self.venue.people)),
+            current_song=song,
             moods=moods
         )
 
@@ -84,8 +89,18 @@ class PlaylistView(VenueBase):
         return self._dispatch()
 
     def get(self):
-        songs = [s.to_dict() for s in self.venue.playlist]
-        return {"playlist": songs}
+        songs = []
+        try:
+            self.log.info("Playlist: {}".format(len(self.venue.playlist)))
+            if len(self.venue.playlist) == 1:
+                songs = [self.venue.playlist[0].to_dict()]
+            else:
+                songs = [s.to_dict() for s in self.venue.playlist]
+            return {"playlist": songs}
+
+        except Exception as e:
+            self.log.exception(str(e))
+            raise e
 
 
 @view_defaults(route_name="song")
@@ -99,16 +114,30 @@ class SongView(VenueBase):
     def get(self):
         if self.method not in self.methods:
             raise HTTPNotFound()
-        return getattr(self, method)()
+        return getattr(self, self.method)()
 
     def current(self):
         return self.venue.playlist[-1].to_dict()
 
     def next(self):
-        limit = self.request.params.get('limit', '1')
+        limit = int(self.request.params.get('limit', 1))
         mood = self.venue.overall_mood
-        songs = self.request.stereomood.search_by_mood(mood, limit=limit)
-        return [s.to_dict() for s in songs]
+        songs = self.request.stereomood.search_by_mood(mood, limit=20)
+        songs = [songs[randrange(0, 19, 1)]]
+        result = []
+        for s in songs:
+            new_s = self.request.stereomood.download_song(s, 
+                        self.request.registry.settings['moodeque.song_cache_path'])
+            song_d = new_s.to_dict()
+            song_d['audio_url'] = "{0}/{1}.mp3".format(
+                self.request.registry.settings["moodeque.song_url"],
+                new_s.id
+            )
+            result.append(song_d)
+            self.venue.play(new_s)
+        return {
+            "songs": result
+        }
 
     def previous(self):
         index = int(self.request.params.get('index', 1))
@@ -125,11 +154,6 @@ class CustomersView(VenueBase):
     def get(self):
         return [u.to_dict() for u in self.venue.users]
 
-    def post(self):
-        user = User.find(self.request.db, self.request.params['user'])
-        user.checkin(self.venue)
-        return user.to_dict()
-
 
 @view_defaults(route_name="customer")
 class CustomerView(VenueBase):
@@ -141,7 +165,14 @@ class CustomerView(VenueBase):
     def get(self):
         return User.find(self.request.db, self.uid).to_dict()
 
+    def post(self):
+        self.log.info("User {} checked in into {}", self.uid, self.venue)
+        user = User.find_by_name(self.request.db, self.uid)
+        user.checkin(self.venue)
+        return user.to_dict()
+
     def delete(self):
-        user = User.find(self.request.db, self.uid)
+        self.log.info("User {} checked out from {}", self.uid, self.venue)
+        user = User.find_by_name(self.request.db, self.uid)
         user.checkout(self.venue)
         return user.to_dict()

@@ -18,6 +18,12 @@ class User(BaseModel, RedisModel):
     def dbindex(cls):
         return "users"
 
+    @classmethod
+    def find_by_name(cls, db, name):
+        for u in cls.all(db):
+            if u.name == name:
+                return u
+
     def __init__(self, db, userid, **kwargs):
         super(User, self).__init__(db, userid, **kwargs)
         self.userid = userid

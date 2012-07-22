@@ -8,14 +8,15 @@ from oauth_hook import OAuthHook
 from mutagen.mp3 import MP3
 from moodeque.models import Song
 
+
 class StereoMoodClient(object):
   POOR_AUTH_URL = "http://www.stereomood.com/api/hackitaly/auth.php"
   SEARCH_URL = "http://www.stereomood.com/api/search.json?q=%s&type=%s&limit=%d"
 
-  def __init__(self, api_key, secret_key, user, password, auth_on_init=True):
+  def __init__(self, api_key, secret_key, username, password, auth_on_init=True):
     self.api_key = api_key
     self.secret_key = secret_key
-    self.user = user
+    self.user = username
     self.password = md5(password).hexdigest()
 
     # Must use a tuple for the right order of the parameters
@@ -53,13 +54,13 @@ class StereoMoodClient(object):
     oauth_hook = OAuthHook(self.oauth_token, self.oauth_token_secret, self.api_key, self.secret_key, True)
     self.client = requests.session(hooks={'pre_request': oauth_hook})
 
-  def search_by_mood(self, mood, limit):
+  def search_by_mood(self, mood, limit=1):
     return self.search_by('mood', mood, limit)
 
-  def search_by_activity(self, activity, limit):
+  def search_by_activity(self, activity, limit=1):
     return self.search_by('activity', activity, limit)
 
-  def search_by_site(self, site, limit):
+  def search_by_site(self, site, limit=1):
     return self.search_by('site', site, limit)
 
   def search_by(self, type, q, limit):

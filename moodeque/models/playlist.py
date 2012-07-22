@@ -62,5 +62,8 @@ class Playlist(RedisModel):
         pass
 
     def __getitem__(self, index):
-        return pickle.loads(self._songs[index])
+        blob = self._songs[index]
+        if not blob:
+            raise KeyError(index)
+        return pickle.loads(blob)
 

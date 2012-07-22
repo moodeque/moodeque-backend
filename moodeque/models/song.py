@@ -1,8 +1,8 @@
 # part of moodeque
 
 class Song(object):
-    def __init__(self, songid, title, artist, album, url, image_url, audio_url, post_url):
-        self.songid = songid
+    def __init__(self, id, title, artist, album, url, image_url, audio_url, post_url):
+        self.id = id
         self.title = title
         self.artist = artist
         self.album = album
@@ -13,5 +13,15 @@ class Song(object):
         self.length = None
         self.local_path = None
 
-
-
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            title=self.title,
+            artist=self.artist,
+            album=self.album,
+            url=self.url,
+            image_url=self.image_url,
+            audio_url=self.audio_url,
+            post_url=self.post_url,
+            length=self.length,
+            local_path=self.local_path)

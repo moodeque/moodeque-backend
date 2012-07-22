@@ -24,7 +24,6 @@ def redis_connect(request):
     conf = {k.replace("redis.", ""): request.registry.settings[k]
             for k in request.registry.settings
             if k.startswith("redis")}
-    log.debug("Connecting to redis: {}".format(conf))
     for opt in ("port", "db"):
         if opt in conf:
             conf[opt] = int(conf[opt])

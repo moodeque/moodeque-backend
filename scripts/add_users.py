@@ -33,10 +33,11 @@ if __name__ == '__main__':
     print "Creating users: ",
     for i in xrange(args.number):
         username = "user{0}".format(i)
-        mood = random.randrange(0, 10, 1)
-        user = User.create(db, name=username, mood=mood)
-        user.checkin(venue)
+        mood = random.randrange(0, 9, 1)
+    #    user = User.create(db, name=username, mood=mood)
+    #    user.checkin(venue)
         print ".",
 
     print " Done."
-    print venue.people
+    user = User.create(db, name="fede", mood=1)
+    user.checkin(venue)

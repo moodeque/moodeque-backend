@@ -8,7 +8,7 @@ class PersonBase(MatchBaseView):
 
     def __init__(self, request):
         super(PersonBase, self).__init__(request)
-        self.user = User.find(self.request.db, self.uid)
+        self.user = User.find_by_name(self.request.db, self.uid)
 
 
 @view_defaults(route_name="people")
@@ -23,7 +23,7 @@ class PeopleView(BaseView):
         return {"users": users}
 
     def post(self):
-        user = User.create(userid=self.request.params['userid'],
+        user = User.create(name=self.request.params['name'],
                            mood=self.request.params.get('mood', 0))
         return user.to_dict()
 
@@ -41,6 +41,7 @@ class PersonView(PersonBase):
     def put(self):
         if 'mood' in self.request.params:
             self.user.mood = self.request.params['mood']
+            self.log.info("Updated user: {0}".format(self.user))
             self.user.save()
         return self.user.to_dict()
 
@@ -58,6 +59,6 @@ class LoginView(PersonBase):
 
     def post(self):
         message = "User {0} logged in".format(self.uid)
+        User.create(self.request.db, name=self.uid, mood=0)
         self.log.info(message)
         return {}
-        # return self.user.to_dict()

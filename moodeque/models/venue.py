@@ -6,6 +6,7 @@ from moodeque.models import playlist
 from moodeque.models.user import User
 from moodeque.models.base import (BaseModel,
                                   RedisModel)
+from collections import Counter
 
 
 class Venue(BaseModel, RedisModel):
@@ -22,13 +23,13 @@ class Venue(BaseModel, RedisModel):
         'worried',
         'serious',
         'cool',
-        'optimistic'
+        'optimistic',
         'energetic',
         'happy',
         'mad',
     )
 
-    export_attrs = ('name', 'description', 'latitude', 'longitude')
+    export_attrs = ('venueid', 'name', 'description', 'latitude', 'longitude')
 
     db_attrs = ('name', 'description', 'latitude', 'longitude', 'crowd_id', 'playlist_id')
 
@@ -61,11 +62,13 @@ class Venue(BaseModel, RedisModel):
 
     def __init__(self, db, venueid, **kwargs):
         super(Venue, self).__init__(db, venueid, **kwargs)
+        self.venueid = venueid
 
     def __str__(self):
         return "%s (%s) is here: %i,%i" %(self.name, self.description,
                                           int(self.latitude), int(self.longitude))
 
+    @property
     def overall_mood(self):
         """
         Returns the overall combined mood of all the users in the venue.
@@ -74,7 +77,10 @@ class Venue(BaseModel, RedisModel):
         counter = Counter(self.MOODS)
 
         for user in self.people:
-            user_mood = self.MOODS[user.mood]
+            import logging
+            logging.getLogger(__name__).info("user: {}".format(user))
+            logging.getLogger(__name__).info(self.MOODS)
+            user_mood = self.MOODS[int(user.mood)]
             counter[user_mood] += 1
 
         # most_common returns a list of tuples (mood, occurrence)
