@@ -1,0 +1,44 @@
+html {
+    background-color: transparent;
+    background: url('/static/images/coverbg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    overflow: hidden;
+}
+body  {
+    font-family: 'Chango', cursive;
+    background-color: transparent;
+}
+#logo {
+    width: 500px;
+    margin-top: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 25px;
+    -webkit-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border-radius: 10px;
+    background-color: white;
+    text-align: center;
+    opacity:0.95;
+    filter:alpha(opacity=95); /* For IE8 and earlier */
+    line-height: 78px;
+    font-size: 36px;
+    -moz-box-shadow: 1px 1px 10px #666;
+    -webkit-box-shadow: 1px 1px 10px #666;
+    box-shadow: 1px 1px 10px #666;
+}
+
+a, a:visited {
+    color: black;
+}
+
+a:hover {
+    color: red;
+    text-decoration: none;
+}
