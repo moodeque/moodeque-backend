@@ -77,7 +77,9 @@ class Venue(BaseModel, RedisModel):
             user_mood = self.MOODS[user.mood]
             counter[user_mood] += 1
 
-        return counter.most_common(1)[0]
+        # most_common returns a list of tuples (mood, occurrence)
+        # we return only the mood of the first (unique) element.
+        return counter.most_common(1)[0][0]
 
     def checkin(self, user):
         """
