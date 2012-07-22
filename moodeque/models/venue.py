@@ -1,4 +1,4 @@
-import operator
+from collections import Counter
 
 from moodeque.models import rediscoll
 from moodeque.models import playlist
@@ -87,13 +87,13 @@ class Venue(object):
         Returns the overall combined mood of all the users in the venue.
         The greater the value, the stronger the feeling.
         """
-        counter = dict([(mood, 0) for mood in self.MOODS])
+        counter = Counter(self.MOODS)
 
         for user in self.users():
             user_mood = self.MOODS[user.mood]
             counter[user_mood] += 1
 
-        return sorted(counter.iteritems(), key=operator.itemgetter(1))[-1][0]
+        return counter.most_common(1)[0]
 
     def checkin(self, user):
         """
