@@ -152,7 +152,7 @@ class CustomersView(VenueBase):
         return self._dispatch()
 
     def get(self):
-        return [u.to_dict() for u in self.venue.users]
+        return [u.to_dict() for u in self.venue.people]
 
 
 @view_defaults(route_name="customer")

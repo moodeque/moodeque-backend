@@ -59,6 +59,9 @@ class LoginView(PersonBase):
 
     def post(self):
         message = "User {0} logged in".format(self.uid)
-        User.create(self.request.db, name=self.uid, mood=0)
+        user = User.find_by_name(self.request.db, self.uid)
+        if not user:
+            self.log.info("Created user {}".format(self.uid))
+            User.create(self.request.db, name=self.uid, mood=0)
         self.log.info(message)
         return {}
