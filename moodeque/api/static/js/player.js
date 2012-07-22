@@ -1,7 +1,7 @@
-(function () {
+function loadSong(AUDIO_FILE) {
 
   var
-    AUDIO_FILE        = 'http://0.0.0.0:6543/static/dancer.js/examples/songs/duhast.mp3',
+    //AUDIO_FILE        = 'http://0.0.0.0:6543/static/dancer.js/examples/songs/duhast.mp3',
     PARTICLE_COUNT    = 250,
     MAX_PARTICLE_SIZE = 12,
     MIN_PARTICLE_SIZE = 2,
@@ -136,5 +136,6 @@
 
   // For debugging
   window.dancer = dancer;
+  console.dir(window.dancer);
 
-})();
+}

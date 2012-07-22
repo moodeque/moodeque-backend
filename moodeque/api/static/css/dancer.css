@@ -68,8 +68,13 @@ canvas {
 }
 #status div.people {
     padding: 25px;
-    padding-bottom: 50px;
+    padding-bottom: 25px;
     text-align: center;
+}
+#status h3 {
+    padding-bottom: 15px;
+    text-align: center;
+    text-shadow: #ccc 1px 1px;
 }
 #status div.people .badge {
     padding: 15px;
