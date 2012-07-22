@@ -6,6 +6,18 @@ from moodeque.models.base import BaseModel
 from moodeque.models.base import RedisModel
 
 
+class PlaylistIterator(object):
+    def __init__(self, pl):
+        self._pl = pl
+        self._i = 0
+        self._len = len(pl)
+    def next(self):
+        if self._i < self._len:
+            s = pickle.loads(self._pl._songs[self._i])
+            self._i += 1
+            return s
+        raise StopIteration
+
 class Playlist(RedisModel):
     db_attrs = ()
 
@@ -43,6 +55,7 @@ class Playlist(RedisModel):
         super(Playlist, self).__init__(db, plid)
         self.plid = plid
         self._songs = None # placeholder
+        self.attach()
 
     def __len__(self):
         return len(self._songs)
@@ -59,7 +72,10 @@ class Playlist(RedisModel):
         return self.current()
 
     def current(self):
-        return self._songs[-1]
+        return self[-1]
+
+    def __iter__(self):
+        return PlaylistIterator(self)
 
     def clean(self):
         self.deattach()
