@@ -30,16 +30,11 @@
 			<p>
 				<img src="images/sad.png"/> &nbsp; <span class="badge badge-important"><em id="sad-counter"></em>% Sad</span>
 			</p>
-			<!--
 			<div id="controls" class="btn-toolbar">
 				<div class="btn-group">
-					<button class="btn" id="stop-song-btn"><i class="icon-stop"></i></btn>
-				</div>
-				<div class="btn-group">
-					<button class="btn" id="play-song-btn"><i class="icon-play"></i></btn>
+					<button class="btn" id="next-song-btn"><i class="icon-forward"></i></btn>
 				</div>
 			</div>
-		-->
 		</div>
 		<div id="song">
 			<div>
@@ -72,7 +67,6 @@
 		var App = {}
 		function getStatus () {
 			jQuery.getJSON('/api/v1/venues/1', setStatus);
-			jQuery.getJSON('/api/v1/venues/1/playlist/next', setNext);
 		}
 		function setStatus(data) {
   			var people = data.people_count;
@@ -88,7 +82,7 @@
 			jQuery('#sad-counter').text(Math.round(sad * 100 / people));
 			setTimeout(function(){
 				getStatus();
-			}, 30000);
+			}, 10000);
 		}
 		function setNext(data) {
 			App.song = data.songs[0]
@@ -99,9 +93,7 @@
 			}
 			catch(err)
 			{
-				setTimeout(function(){
-					setSong();
-				}, 30000);
+				//nop
 			}
 		}
 		function setSong() {
@@ -119,6 +111,9 @@
 		}
 		jQuery(document).ready(function () {
 			getStatus();
+			jQuery('#next-song-btn').click(function () {
+				jQuery.getJSON('/api/v1/venues/1/playlist/next', setNext);
+			});
 			/*
 			jQuery('#song-author').text('Rammstein');
 			jQuery('#song-title').text('Du Hast');
