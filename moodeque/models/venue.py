@@ -14,6 +14,20 @@ class Venue(BaseModel, RedisModel):
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
+
+    MOODS = (
+        'crap',
+        'sad',
+        'melancholy',
+        'worried',
+        'serious',
+        'cool',
+        'optimistic'
+        'energetic',
+        'happy',
+        'mad',
+    )
+
     export_attrs = ('name', 'description', 'latitude', 'longitude')
 
     db_attrs = ('name', 'description', 'latitude', 'longitude', 'crowd_id', 'playlist_id')
