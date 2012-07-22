@@ -71,8 +71,8 @@
 		<script>
 		var App = {}
 		function getStatus () {
-			jQuery.getJSON('/api/v1/venues/1', setStatus);
-			jQuery.getJSON('/api/v1/venues/1/playlist/next', setNext);
+			jQuery.getJSON('/api/venues/hackitaly', setStatus);
+			jQuery.getJSON('/api/venues/hackitaly/playlist/next', setNext);
 		}
 		function setStatus(data) {
   			var people = data.people_count;
@@ -88,13 +88,21 @@
 			jQuery('#sad-counter').text(Math.round(sad * 100 / people));
 			setTimeout(function(){
 				getStatus();
-			}, 10000);
+			}, 30000);
 		}
 		function setNext(data) {
 			App.song = data.songs[0]
-			setTimeout(function(){
-				setSong();
-			}, 45000);
+			try
+			{
+				//loadSong('/static/songs/duhast.mp3');
+				setSong()
+			}
+			catch(err)
+			{
+				setTimeout(function(){
+					setSong();
+				}, 30000);
+			}
 		}
 		function setSong() {
 			window.dancer.stop();
@@ -105,10 +113,11 @@
 		}
 		jQuery(document).ready(function () {
 			getStatus();
+			/*
 			jQuery('#song-author').text('Rammstein');
 			jQuery('#song-title').text('Du Hast');
 			jQuery('#song-album').text('Sehnsucht');
-			loadSong('/static/songs/duhast.mp3');
+			*/
 		});
 		</script>
 	</body>
