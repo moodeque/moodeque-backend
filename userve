@@ -1,0 +1,10 @@
+#!/bin/bash
+[ -z $1 ] && echo "Missing ini file" && exit 2
+INI=$(realpath $1) ; shift
+
+PORT=6543
+
+PYHOME=""
+[ -z $VIRTUAL_ENV ] || PYHOME="--pyhome $VIRTUAL_ENV"
+#USERVE_PASTE_INI="$INI" uwsgi --http :$PORT --module wsgi $PYHOME --async 100 --loop gevent "$@" --enable-threads --static-map /static=moodeque/api/static
+USERVE_PASTE_INI="$INI" uwsgi --http :$PORT --module wsgi $PYHOME --static-map /static=moodeque/api/static -p 4 --static-map /songs=songs
