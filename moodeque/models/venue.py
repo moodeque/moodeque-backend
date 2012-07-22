@@ -109,7 +109,7 @@ class Venue(BaseModel, RedisModel):
         """
         return (User.find(self._db, uid) for uid in self._crowd.all())
 
-    @property(self):
+    @property
     def count_people(self):
         """
         Efficiently returns how many people are currently in the venue.
