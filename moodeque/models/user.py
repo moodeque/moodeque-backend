@@ -6,9 +6,9 @@ from moodeque.models.base import (BaseModel,
 
 
 class User(BaseModel, RedisModel):
-    export_attrs = ('mood',)
+    export_attrs = ('name', 'mood',)
 
-    db_attrs = ('mood',)
+    db_attrs = ('name', 'mood',)
 
     @classmethod
     def dbname(cls, userid):
@@ -19,9 +19,12 @@ class User(BaseModel, RedisModel):
         return "users"
 
     def __init__(self, db, userid, **kwargs):
-        super(User, self).__init__(db, plid)
+        super(User, self).__init__(db, userid, **kwargs)
         self.userid = userid
 
+    def __str__(self):
+        return "%s (%i) has mood %i" %(self.name, int(self.userid), int(self.mood))
+ 
     def checkin(self, venue):
         """
         Register an user in the venue. The user will now contribute to

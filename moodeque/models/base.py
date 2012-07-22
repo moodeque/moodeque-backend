@@ -11,7 +11,7 @@ class BaseModel(object):
 class RedisModel(object):
     @classmethod
     def autoid(cls, db):
-        return db.incr("%s.seqno" % (cls.dbindex()))
+        return int(db.incr("%s.seqno" % (cls.dbindex())))
 
     @classmethod
     def register(cls, db, did):
@@ -29,15 +29,15 @@ class RedisModel(object):
         return robj.all()
 
     @classmethod
-    def setup(cls, db):
+    def setup(cls, obj, db):
         pass
 
     @classmethod
-    def shutdown(cls, db):
+    def shutdown(cls, obj, db):
         pass
 
     @classmethod
-    def lookup(cls, db):
+    def lookup(cls, obj, db):
         pass
 
     @classmethod
@@ -45,7 +45,7 @@ class RedisModel(object):
         did = cls.autoid(db)
         obj = cls.__new__(cls)
         obj.__init__(db, did, **kwargs)
-        cls.setup(db)
+        cls.setup(obj, db)
         cls.register(db, did)
         obj.save()
         return obj
@@ -59,13 +59,13 @@ class RedisModel(object):
         robj = cls.load(db, did)
         obj = cls.__new__(cls)
         obj.__init__(db, did, **robj)
-        cls.lookup(db)
+        cls.lookup(obj, db)
         return obj
 
     def __init__(self, db, rid, **kwargs):
         self._db = db
         self._id = rid
-        for k, v in kwargs:
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
     def save(self):
@@ -75,6 +75,6 @@ class RedisModel(object):
 
     def destroy(self):
         self.__class__.deregister(self._db, self._id)
-        self.__class__.shutdown(self._db)
+        self.__class__.shutdown(self, self._db)
         self._db.delete(self.__class__.dbname(self._id))
 

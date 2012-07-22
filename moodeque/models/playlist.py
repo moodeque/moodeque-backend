@@ -1,5 +1,6 @@
 # part of moodeque
 
+import pickle
 from . import rediscoll
 from moodeque.models.base import BaseModel
 from moodeque.models.base import RedisModel
@@ -44,10 +45,15 @@ class Playlist(RedisModel):
         return len(self._songs)
 
     def __contains__(self, song):
-        return song in self._songs
+        _s = pickle.dumps(song)
+        return _s in self._songs
 
     def append(self, song):
-        return self._songs.append(song)
+        return self._songs.append(pickle.dumps(song))
+
+    @property
+    def playing(self):
+        return self.current()
 
     def current(self):
         return self._songs[-1]
@@ -56,5 +62,5 @@ class Playlist(RedisModel):
         pass
 
     def __getitem__(self, index):
-        return self._songs[index]
+        return pickle.loads(self._songs[index])
 
