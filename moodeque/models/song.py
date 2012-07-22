@@ -25,3 +25,8 @@ class Song(object):
             post_url=self.post_url,
             length=self.length,
             local_path=self.local_path)
+
+    def __str__(self):
+        return "#%s %s/%s by %s at %s" %(str(self.songid), str(self.album),
+                                         str(self.title), str(self.artist),
+                                         str(self.url))
