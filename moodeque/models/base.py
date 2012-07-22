@@ -79,8 +79,11 @@ class RedisModel(object):
         for attr in self.db_attrs:
             robj[attr] = getattr(self, attr)
 
+    def deattach(self):
+        self._db.delete(self.__class__.dbname(self._id))
+
     def destroy(self):
         self.__class__.deregister(self._db, self._id)
         self.__class__.shutdown(self, self._db)
-        self._db.delete(self.__class__.dbname(self._id))
+        self.deattach()
 

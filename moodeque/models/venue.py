@@ -98,9 +98,7 @@ class Venue(BaseModel, RedisModel):
     @property
     def playlist(self):
         """
-        Returns l'oggetto playlist.
-        The currently played song is always the first one, the others
-        following in reverse played order.
+        Returns the underlying playlist object.
         """
         return self._playlist
 
@@ -111,6 +109,13 @@ class Venue(BaseModel, RedisModel):
         """
         return (User.find(self._db, uid) for uid in self._crowd.all())
 
+    @property(self):
+    def count_people(self):
+        """
+        Efficiently returns how many people are currently in the venue.
+        """
+        return len(self._crowd)
+
     def play(self, song):
         """
         Registers the given song as the one currently being played.
@@ -118,5 +123,10 @@ class Venue(BaseModel, RedisModel):
         self._playlist.append(song)
 
     def get_in_playlist(self, index):
-        "index sempre negativo, ritorna oggetto song"
+        """
+        Returns a past played song. Index must always be negative.
+        """
+        if index > 0:
+            raise IndexError("playlist index must be negative")
         return self._playlist[index]
+
