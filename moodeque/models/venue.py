@@ -1,28 +1,28 @@
+<<<<<<< HEAD
 from collections import Counter
 
 from moodeque.models import rediscoll
+=======
+# part of moodeque
+
+from . import rediscoll
+from moodeque.models import crowd
+>>>>>>> models
 from moodeque.models import playlist
+from moodeque.models.user import User
+from moodeque.models.base import (BaseModel,
+                                  RedisModel)
 
 
-class Venue(object):
+class Venue(BaseModel, RedisModel):
     """
     This class represents a Moodeque venue.
     A Venue is any place where music is played, users gather and they (hopefully)
     have fun and interact.
     """
+    export_attrs = ('name', 'description', 'latitude', 'longitude')
 
-    MOODS = (
-        'crap',
-        'sad',
-        'melancholy',
-        'worried',
-        'serious',
-        'cool',
-        'optimistic'
-        'energetic',
-        'happy',
-        'mad',
-    )
+    db_attrs = ('name', 'description', 'latitude', 'longitude', 'crowd_id', 'playlist_id')
 
     @classmethod
     def dbname(cls, venueid):
@@ -33,54 +33,26 @@ class Venue(object):
         return "venues"
 
     @classmethod
-    def autoid(cls, db):
-        return db.incr("%s.seqno" %(PlayList.dbindex()))
+    def setup(cls, obj, db):
+        obj._playlist = playlist.Playlist.create(db)
+        obj._crowd = crowd.Crowd.create(db)
+        obj.playlist_id = obj._playlist.plid
+        obj.crowd_id = obj._crowd.crid
 
     @classmethod
-    def create(cls, db, description, latitude, longitude):
-        venueid = Venue.autoid()
-        robj = Venue(db, venueid, description, latitude, longitude)
-        idx = rediscoll.Set(Venue.dbindex(), db)
-        idx.add(Venue.dbname(venueid))
-        robj.save()
-        return robj
+    def shutdown(cls, obj, db):
+        obj._playlist.destroy()
+        obj._crowd.destroy()
 
     @classmethod
-    def find(cls, db, venueid):
-        robj = rediscoll.Hash(Venue.dbname(venueid), db)
-        venue = Venue(db, venueid,
-                      robj['description'],
-                      robj['latitude'],
-                      robj['longitude'])
-        venue._last_mood = robj['last_mood']
-        venue._playlist = playlist.PlayList.find(db, venueid)
+    def lookup(cls, obj, db):
+        obj._playlist = playlist.Playlist.find(db, self.playlist_id)
+        obj._crowd = crowd.Crowd.find(db, self.crowd_id)
+        obj.playlist_id = obj._playlist.plid
+        obj.crowd_id = obj._crowd.crid
 
-    @classmethod
-    def all(cls, db):
-        robj = rediscoll.Set(Venue.dbindex(), db)
-        return robj.all()
-
-    def save(self):
-        robj = rediscoll.Hash(Venue.dbname(self.venueid), self._db)
-        robj['description'] = self.description
-        robj['latitude'] = self.latitude
-        robj['longitude'] = self.longitude
-
-    def destroy(self):
-        idx = rediscoll.Set(Venue.dbindex(), self._db)
-        idx.remove(self.venueid)
-        self._db.delete(Venue.dbname(self.venueid))
-
-    def __init__(self, db, venueid, description, latitude, longitude):
-        self.venueid = venueid
-        self.description = description
-        self.latituide = latitude
-        self.longitude = longitude
-        self._db = db
-        self._last_mood = None
-        self._playlist = playlist.PlayList(name, db)
-        self._user_moods = crowd.Crowd(name, db)
-        self._user_group = population.Population(name, db)
+    def __init__(self, db, venueid, **kwargs):
+        super(Venue, self).__init__(db, venueid, **kwargs)
 
     def overall_mood(self):
         """
@@ -100,14 +72,14 @@ class Venue(object):
         Register an user in the venue. The user will now contribute to
         the overall mood of the venue.
         """
-        raise NotImplementedError
+        self._crowd.add(user.userid)
 
     def checkout(self, user):
         """
         Deregister an user from the venue. The user will no longer contribute to
         the overall mood of the venue.
         """
-        raise NotImplementedError
+        self._crowd.remove(user.userid)
 
     @property
     def playlist(self):
@@ -116,21 +88,21 @@ class Venue(object):
         The currently played song is always the first one, the others
         following in reverse played order.
         """
-        raise NotImplementedError
+        return self._playlist
+
+    @property
+    def people(self):
+        """
+        Returns an iterable containing of all the users objects currently in the venue.
+        """
+        return (User.find(self._db, uid) for uid in self._crowd.all())
 
     def play(self, song):
         """
         Registers the given song as the one currently being played.
         """
-        raise NotImplementedError
+        self._playlist.append(song)
 
     def get_in_playlist(self, index):
         "index sempre negativo, ritorna oggetto song"
-        raise NotImplementedError
-
-    def users(self):
-        """
-        Returns an iterable containing of all the users objects currently in the venue.
-        """
-        raise NotImplementedError
-
+        return self._playlist[index]

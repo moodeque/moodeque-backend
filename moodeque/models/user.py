@@ -1,8 +1,15 @@
-# (C) 2012 Francesco Romani <fromani . gmail . com>
-from moodeque.models import rediscoll
+# part of moodeque
+
+from . import rediscoll
+from moodeque.models.base import (BaseModel,
+                                  RedisModel)
 
 
-class User(object):
+class User(BaseModel, RedisModel):
+    export_attrs = ('name', 'mood',)
+
+    db_attrs = ('name', 'mood',)
+
     @classmethod
     def dbname(cls, userid):
         return "user.%s" %(str(userid))
@@ -11,43 +18,13 @@ class User(object):
     def dbindex(cls):
         return "users"
 
-    @classmethod
-    def autoid(cls, db):
-        return db.incr("%s.seqno" %(PlayList.dbindex()))
-
-    @classmethod
-    def create(cls, db, mood):
-        userid = User.autoid(db)
-        usr = User(db, userid, mood)
-        idx = rediscoll.Set(User.dbindex(), db)
-        idx.add(User.dbname(userid))
-        usr.save()
-        return usr
-
-    @classmethod
-    def find(cls, db, userid):
-        robj = rediscoll.Hash(User.dbname(userid), db)
-        return User(db, userid, robj['mood'])
-
-    @classmethod
-    def all(cls, db):
-        robj = rediscoll.Set(User.dbindex(), db)
-        return robj.all()
-
-    def save(self):
-        robj = rediscoll.Hash(User.dbname(self.userid), self._db)
-        robj['mood'] = self.mood
-
-    def destroy(self):
-        idx = rediscoll.Set(User.dbindex(), self._db)
-        idx.remove(self.userid)
-        self._db.delete(User.dbname(self.userid))
-
-    def __init__(self, db, userid, mood):
-        self._db = db
+    def __init__(self, db, userid, **kwargs):
+        super(User, self).__init__(db, userid, **kwargs)
         self.userid = userid
-        self.mood = mood
 
+    def __str__(self):
+        return "%s (%i) has mood %i" %(self.name, int(self.userid), int(self.mood))
+ 
     def checkin(self, venue):
         """
         Register an user in the venue. The user will now contribute to
