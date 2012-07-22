@@ -105,7 +105,13 @@
 			}
 		}
 		function setSong() {
-			window.dancer.stop();
+			try
+			{
+				window.dancer.stop();
+			} catch(err)
+			{
+				//nop
+			}
 			loadSong(App.song.audio_url);
 			jQuery('#song-author').text(App.song.artist);
 			jQuery('#song-title').text(App.song.title);
