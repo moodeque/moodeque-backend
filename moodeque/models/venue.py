@@ -40,8 +40,8 @@ class Venue(BaseModel, RedisModel):
 
     @classmethod
     def lookup(cls, obj, db):
-        obj._playlist = playlist.Playlist.find(db, self.playlist_id)
-        obj._crowd = crowd.Crowd.find(db, self.crowd_id)
+        obj._playlist = playlist.Playlist.find(db, obj.playlist_id)
+        obj._crowd = crowd.Crowd.find(db, obj.crowd_id)
         obj.playlist_id = obj._playlist.plid
         obj.crowd_id = obj._crowd.crid
 
